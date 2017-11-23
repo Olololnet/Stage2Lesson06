@@ -45,6 +45,8 @@ CList::CList(const CList& clBaseList)
         else
             pCurNewElement->m_pPrevNode = NULL;
 
+        m_pEndNode = pCurNewElement;
+
         pCurNode = pCurNode->m_pNextNode;
         pCurNewPrevElement = pCurNewElement;
     }
@@ -192,27 +194,29 @@ const int& CList::at(const int& iElementNum) const
     while (curStruct)
     {
         if (iCurIndex == iElementNum)
-            return curStruct->m_iData;
+            break;
 
         curStruct = curStruct->m_pNextNode;
         ++iCurIndex;
     }
+    return curStruct->m_iData;
 }
 
 int& CList::at(const int& iElementNum)
 {
-     int iCurIndex = 0;
+    int iCurIndex = 0;
 
-     CDoubleLinkedStruct* curStruct = m_pStartNode;
+    CDoubleLinkedStruct* curStruct = m_pStartNode;
 
-     while (curStruct)
-     {
-         if (iCurIndex == iElementNum)
-             return curStruct->m_iData;
+    while (curStruct)
+    {
+        if (iCurIndex == iElementNum)
+            break;
 
-         curStruct = curStruct->m_pNextNode;
-         ++iCurIndex;
-     }
+        curStruct = curStruct->m_pNextNode;
+        ++iCurIndex;
+    }
+    return curStruct->m_iData;
 }
 
 CList& CList::operator=(const CList& clBaseList)
@@ -244,6 +248,8 @@ CList& CList::operator=(const CList& clBaseList)
         pCurNewElement = new CDoubleLinkedStruct(*pCurCopyingNode);
         pCurNewElement->m_pPrevNode = pCurNewPrevElement;
         pCurNewPrevElement->m_pNextNode = pCurNewElement;
+
+        m_pEndNode = pCurNewElement;
 
         pCurCopyingNode = pCurCopyingNode->m_pNextNode;
         pCurNewPrevElement = pCurNewElement;
