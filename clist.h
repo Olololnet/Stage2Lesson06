@@ -30,7 +30,7 @@ class CList
 {
 public:
     CList();
-    CList(const CList& clBaseList);
+    explicit CList(const CList& clBaseList);
     ~CList();
     void push_back(const int& iData);
     void ShowAllElements();

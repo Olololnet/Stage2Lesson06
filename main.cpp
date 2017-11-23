@@ -8,33 +8,29 @@ int main()
     // деструктор
     // методы добавления и удаления элемента
     // метод .at(index), возвращающий элемент по его номеру
-    // оператор =
+    // operator=
 
-    CList* pSomeList = new CList();
+    CList cSomeList;
 
-    pSomeList->push_back(1);
-    pSomeList->push_back(2);
-    pSomeList->push_back(3);
+    cSomeList.push_back(1);
+    cSomeList.push_back(2);
+    cSomeList.push_back(3);
 
-    pSomeList->ShowAllElements();
+    cSomeList.ShowAllElements();
 
-    CList* pSomeNewList = new CList(*pSomeList);
+    CList cSomeNewList(cSomeList);
 
-    pSomeNewList->ShowAllElements();
+    cSomeNewList.ShowAllElements();
 
-    pSomeNewList->at(0) = 10;
-    pSomeNewList->at(1) = 20;
-    pSomeNewList->at(2) = 30;
+    cSomeNewList.at(0) = 10;
+    cSomeNewList.at(1) = 20;
+    cSomeNewList.at(2) = 30;
 
-    pSomeNewList->ShowAllElements();
+    cSomeNewList.ShowAllElements();
 
     CList SomeAnotherList;
-    SomeAnotherList = *pSomeNewList;
+    SomeAnotherList = cSomeNewList;
     SomeAnotherList.ShowAllElements();
-
-    delete pSomeList;
-    delete pSomeNewList;
 
     return 0;
 }
-

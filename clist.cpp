@@ -19,6 +19,7 @@ CList::CList(const CList& clBaseList)
     if (clBaseList.m_pStartNode == clBaseList.m_pEndNode)
     {
         m_pStartNode = new CDoubleLinkedStruct(*clBaseList.m_pStartNode);
+        m_pEndNode   = m_pStartNode;
         m_pStartNode->m_pNextNode = NULL;
         m_pStartNode->m_pPrevNode = NULL;
         return;
@@ -67,8 +68,8 @@ CList::~CList()
 void CList::push_back(const int& iData)
 {
     if (!m_pStartNode)
-    {// no element
-        CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData); // указатели 0 0
+    {
+        CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData);
         m_pStartNode = pNewElement;
         m_pEndNode   = pNewElement;
     }
@@ -76,22 +77,20 @@ void CList::push_back(const int& iData)
     {
         if (m_pStartNode == m_pEndNode)
         {
-            CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData, m_pStartNode); // указатель на предыдущий - стартовый
+            CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData, m_pStartNode);
 
             m_pStartNode->m_pNextNode = pNewElement;
             m_pEndNode = pNewElement;
         }
         else
-        { // есть как минимум 1 стартовый и 1 конечный
-            CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData, m_pEndNode); // указатель на предыдущий - конечный текущий
+        {
+            CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData, m_pEndNode);
             m_pEndNode->m_pNextNode = pNewElement;
 
-            m_pEndNode = pNewElement; // обновление последнего
+            m_pEndNode = pNewElement;
         }
     }
 }
-
-// удаление элементов - приравнивать стартовый к конечному, сброс начального если -1. удаление если элементов нет
 
 void CList::RecursiveShowAllElements(CDoubleLinkedStruct* pCurNode)
 {
@@ -114,16 +113,16 @@ void CList::ShowAllElements()
 
 void CList::EraseLastElement()
 {
-    if (!m_pStartNode) // 0
+    if (!m_pStartNode)
         return;
 
-    if (m_pStartNode == m_pEndNode) // 1
+    if (m_pStartNode == m_pEndNode)
     {
         delete m_pStartNode;
         m_pStartNode = NULL;
         m_pEndNode = NULL;
     }
-    else // 2+
+    else
     {
         CDoubleLinkedStruct* pPrevNode = m_pEndNode->m_pPrevNode;
         delete m_pEndNode;
@@ -202,7 +201,7 @@ const int& CList::at(const int& iElementNum) const
 
 int& CList::at(const int& iElementNum)
 {
-    int iCurIndex = 0;
+     int iCurIndex = 0;
 
      CDoubleLinkedStruct* curStruct = m_pStartNode;
 
@@ -218,6 +217,37 @@ int& CList::at(const int& iElementNum)
 
 CList& CList::operator=(const CList& clBaseList)
 {
-    CList* pNewList = new CList(clBaseList);
-    return *pNewList;
+    if (&clBaseList == this)
+        return *this;
+
+    if (clBaseList.m_pStartNode == NULL && clBaseList.m_pEndNode == NULL)
+    {
+        m_pStartNode = NULL;
+        m_pEndNode   = NULL;
+        return *this;
+    }
+
+    if (clBaseList.m_pStartNode == clBaseList.m_pEndNode)
+    {
+        m_pStartNode = new CDoubleLinkedStruct(*clBaseList.m_pStartNode);
+        m_pEndNode   = m_pStartNode;
+        return *this;
+    }
+
+    m_pStartNode = new CDoubleLinkedStruct(*clBaseList.m_pStartNode);
+    CDoubleLinkedStruct* pCurCopyingNode = clBaseList.m_pStartNode->m_pNextNode;
+    CDoubleLinkedStruct* pCurNewPrevElement = m_pStartNode;
+    CDoubleLinkedStruct* pCurNewElement = NULL;
+
+    while (pCurCopyingNode)
+    {
+        pCurNewElement = new CDoubleLinkedStruct(*pCurCopyingNode);
+        pCurNewElement->m_pPrevNode = pCurNewPrevElement;
+        pCurNewPrevElement->m_pNextNode = pCurNewElement;
+
+        pCurCopyingNode = pCurCopyingNode->m_pNextNode;
+        pCurNewPrevElement = pCurNewElement;
+    }
+
+    return *this;
 }
