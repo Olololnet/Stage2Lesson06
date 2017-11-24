@@ -8,13 +8,11 @@ CList::CList()
 }
 
 CList::CList(const CList& clBaseList)
+:m_pStartNode(NULL)
+,m_pEndNode(NULL)
 {
     if (!clBaseList.m_pStartNode && !clBaseList.m_pEndNode)
-    {
-        m_pStartNode = NULL;
-        m_pEndNode   = NULL;
         return;
-    }
 
     if (clBaseList.m_pStartNode == clBaseList.m_pEndNode)
     {
@@ -25,30 +23,12 @@ CList::CList(const CList& clBaseList)
         return;
     }
 
-    m_pStartNode = new CDoubleLinkedStruct(*clBaseList.m_pStartNode);
-    m_pStartNode->m_pNextNode = NULL;
-    m_pStartNode->m_pPrevNode = NULL;
-
-    CDoubleLinkedStruct* pCurNode = clBaseList.m_pStartNode->m_pNextNode;
-    CDoubleLinkedStruct* pCurNewPrevElement = m_pStartNode;
-    CDoubleLinkedStruct* pCurNewElement = NULL;
+    CDoubleLinkedStruct* pCurNode = clBaseList.m_pStartNode;
 
     while (pCurNode)
     {
-        pCurNewElement = new CDoubleLinkedStruct(*pCurNode);
-
-        if (pCurNewPrevElement)
-        {
-            pCurNewElement->m_pPrevNode = pCurNewPrevElement;
-            pCurNewPrevElement->m_pNextNode = pCurNewElement;
-        }
-        else
-            pCurNewElement->m_pPrevNode = NULL;
-
-        m_pEndNode = pCurNewElement;
-
+        push_back(pCurNode->m_iData);
         pCurNode = pCurNode->m_pNextNode;
-        pCurNewPrevElement = pCurNewElement;
     }
 }
 
@@ -59,10 +39,7 @@ CList::~CList()
     while (pCurFlushNode)
     {
         CDoubleLinkedStruct* pNextNode = pCurFlushNode->m_pNextNode;
-
-        std::cout << "remove " << pCurFlushNode->m_iData << std::endl;
         delete pCurFlushNode;
-
         pCurFlushNode = pNextNode;
     }
 }
@@ -88,7 +65,6 @@ void CList::push_back(const int& iData)
         {
             CDoubleLinkedStruct* pNewElement = new CDoubleLinkedStruct(iData, m_pEndNode);
             m_pEndNode->m_pNextNode = pNewElement;
-
             m_pEndNode = pNewElement;
         }
     }
@@ -108,7 +84,7 @@ void CList::ShowAllElements()
 {
     if (m_pStartNode)
     {
-        std::cout << "New show all elements:" << std::endl;
+        std::cout << "Next show all elements:" << std::endl;
         RecursiveShowAllElements(m_pStartNode);
     }
 }
@@ -134,26 +110,10 @@ void CList::EraseLastElement()
     }
 }
 
-void CList::EraseByIndex(const int& iElementNum)
+void CList::EraseStruct(CDoubleLinkedStruct *pCurStruct)
 {
-    int iCurIndex = 0;
-
-    CDoubleLinkedStruct* curStruct = m_pStartNode;
-
-    if (!curStruct)
-        return;
-
-    while (curStruct)
-    {
-        if (iCurIndex == iElementNum)
-            break;
-
-        curStruct = curStruct->m_pNextNode;
-        ++iCurIndex;
-    }
-
-    CDoubleLinkedStruct* pNextNode = curStruct->m_pNextNode;
-    CDoubleLinkedStruct* pPrevNode = curStruct->m_pPrevNode;
+    CDoubleLinkedStruct* pNextNode = pCurStruct->m_pNextNode;
+    CDoubleLinkedStruct* pPrevNode = pCurStruct->m_pPrevNode;
 
     if (!pPrevNode)
     {
@@ -182,14 +142,17 @@ void CList::EraseByIndex(const int& iElementNum)
         }
     }
 
-    delete curStruct;
+    delete pCurStruct;
 }
 
-const int& CList::at(const int& iElementNum) const
+void CList::EraseByIndex(const int& iElementNum)
 {
     int iCurIndex = 0;
 
     CDoubleLinkedStruct* curStruct = m_pStartNode;
+
+    if (!curStruct)
+        return;
 
     while (curStruct)
     {
@@ -199,61 +162,40 @@ const int& CList::at(const int& iElementNum) const
         curStruct = curStruct->m_pNextNode;
         ++iCurIndex;
     }
-    return curStruct->m_iData;
+
+    EraseStruct(curStruct);
 }
 
-int& CList::at(const int& iElementNum)
+const int& CList::at(const size_t& uElementNum) const
 {
-    int iCurIndex = 0;
+    size_t uCurIndex = 0;
 
     CDoubleLinkedStruct* curStruct = m_pStartNode;
 
     while (curStruct)
     {
-        if (iCurIndex == iElementNum)
+        if (uCurIndex == uElementNum)
             break;
 
         curStruct = curStruct->m_pNextNode;
-        ++iCurIndex;
+        ++uCurIndex;
     }
     return curStruct->m_iData;
 }
 
-CList& CList::operator=(const CList& clBaseList)
+int& CList::at(const size_t& uElementNum)
 {
-    if (&clBaseList == this)
-        return *this;
+     size_t uCurIndex = 0;
 
-    if (clBaseList.m_pStartNode == NULL && clBaseList.m_pEndNode == NULL)
-    {
-        m_pStartNode = NULL;
-        m_pEndNode   = NULL;
-        return *this;
-    }
+     CDoubleLinkedStruct* curStruct = m_pStartNode;
 
-    if (clBaseList.m_pStartNode == clBaseList.m_pEndNode)
-    {
-        m_pStartNode = new CDoubleLinkedStruct(*clBaseList.m_pStartNode);
-        m_pEndNode   = m_pStartNode;
-        return *this;
-    }
+     while (curStruct)
+     {
+         if (uCurIndex == uElementNum)
+             break;
 
-    m_pStartNode = new CDoubleLinkedStruct(*clBaseList.m_pStartNode);
-    CDoubleLinkedStruct* pCurCopyingNode = clBaseList.m_pStartNode->m_pNextNode;
-    CDoubleLinkedStruct* pCurNewPrevElement = m_pStartNode;
-    CDoubleLinkedStruct* pCurNewElement = NULL;
-
-    while (pCurCopyingNode)
-    {
-        pCurNewElement = new CDoubleLinkedStruct(*pCurCopyingNode);
-        pCurNewElement->m_pPrevNode = pCurNewPrevElement;
-        pCurNewPrevElement->m_pNextNode = pCurNewElement;
-
-        m_pEndNode = pCurNewElement;
-
-        pCurCopyingNode = pCurCopyingNode->m_pNextNode;
-        pCurNewPrevElement = pCurNewElement;
-    }
-
-    return *this;
+         curStruct = curStruct->m_pNextNode;
+         ++uCurIndex;
+     }
+     return curStruct->m_iData;
 }

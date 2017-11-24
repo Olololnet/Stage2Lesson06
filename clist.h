@@ -16,31 +16,22 @@ struct CDoubleLinkedStruct
     {
 
     }
-
-    CDoubleLinkedStruct(const CDoubleLinkedStruct& cdlBaseStruct)
-    :m_iData(cdlBaseStruct.m_iData)
-    ,m_pNextNode(NULL)
-    ,m_pPrevNode(NULL)
-    {
-
-    }
 };
 
 class CList
 {
 public:
     CList();
-    explicit CList(const CList& clBaseList);
+    CList(const CList& clBaseList);
     ~CList();
     void push_back(const int& iData);
     void ShowAllElements();
     void EraseLastElement();
+    void EraseStruct(CDoubleLinkedStruct* pCurStruct);
     void EraseByIndex(const int& iElementNum);
 
-    const int& at(const int& iElementNum) const;
-    int& at(const int &iElementNum);
-
-    CList& operator=(const CList& clBaseList);
+    const int& at(const size_t& uElementNum) const;
+    int& at(const size_t& uElementNum);
 
 private:
     CDoubleLinkedStruct* m_pStartNode;
